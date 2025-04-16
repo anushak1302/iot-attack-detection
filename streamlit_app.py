@@ -5,37 +5,36 @@ import json
 import time
 import matplotlib.pyplot as plt
 
+# Setup Streamlit page
 st.set_page_config(page_title="IoT Attack Detection", layout="wide")
 st.title("🔐 IoT Attack Detection Dashboard")
-st.markdown("This app simulates real-time detection of IoT network attacks using a Random Forest model.")
+st.markdown("Simulating real-time detection of IoT network attacks using a Random Forest model.")
 
-# Load model and features
+# Load trained model and feature list
 model = joblib.load("new_model_all_features.pkl")
+
 with open("features.json", "r") as f:
     training_features = json.load(f)
 
-# Load full dataset and filter
-df_full = pd.read_csv("RT_IOT2022.csv")  # or use RT_IOT2022_small.csv
+# Load the balanced test dataset with fake benign traffic
+df_full = pd.read_csv("streamlit_test_balanced_100_fakebenign.csv")
 df_full = df_full.dropna()
 
-# Sample 20% Benign, 80% Attack to make it realistic
-benign_df = df_full[df_full["Attack_type"] == "Benign"].sample(n=20, random_state=42)
-attack_df = df_full[df_full["Attack_type"] != "Benign"].sample(n=80, random_state=42)
-df_sim = pd.concat([benign_df, attack_df]).sample(frac=1, random_state=42)  # shuffle
+# Prepare data
+df = df_full[training_features]
+labels = df_full["Attack_type"]
 
-# Prepare features and labels
-df = df_sim[training_features]
-labels = df_sim["Attack_type"]
-
-# Sidebar controls
+# Sidebar settings
 st.sidebar.header("⚙️ Simulation Settings")
 row_limit = st.sidebar.slider("How many rows to simulate?", 10, 100, 25)
-delay = st.sidebar.slider("Delay between predictions (sec)", 0.1, 2.0, 0.5)
+delay = st.sidebar.slider("Delay between predictions (seconds)", 0.1, 2.0, 0.5)
 
+# Tabs and placeholders
 tab1, tab2 = st.tabs(["📋 Detection Log", "📊 Attack Summary"])
 log_placeholder = tab1.empty()
 chart_placeholder = tab2.empty()
 
+# Simulation button
 if st.button("🚀 Start Simulation"):
     result_log = []
     chart_data = []
@@ -57,13 +56,14 @@ if st.button("🚀 Start Simulation"):
         chart_data.append(prediction)
         result_df = pd.DataFrame(result_log)
 
+        # Update table
         with tab1:
             log_placeholder.subheader("📋 Real-Time Detection Log")
             log_placeholder.dataframe(result_df, use_container_width=True)
-
             if prediction != "Benign":
                 st.warning(f"⚠️ Alert: {prediction} attack detected!")
 
+        # Update pie chart
         with tab2:
             pie_data = pd.Series(chart_data).value_counts()
             fig, ax = plt.subplots()
