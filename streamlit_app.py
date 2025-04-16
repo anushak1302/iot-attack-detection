@@ -5,12 +5,12 @@ import json
 import time
 import matplotlib.pyplot as plt
 
-# Page layout
+# Set up page layout
 st.set_page_config(page_title="IoT Attack Detection", layout="wide")
 
-# App title
+# Title and intro
 st.title("🔐 IoT Attack Detection Dashboard")
-st.markdown("Simulated attack detection on IoT network traffic using a trained machine learning model.")
+st.markdown("This dashboard simulates real-time detection of network attacks using a trained machine learning model.")
 
 # Load trained model
 model = joblib.load("random_forest_model.pkl")
@@ -19,17 +19,24 @@ model = joblib.load("random_forest_model.pkl")
 with open("features.json", "r") as f:
     training_features = json.load(f)
 
-# Load dataset and prepare features and labels
+# Load dataset and ensure exact feature match
 df_full = pd.read_csv("RT_IOT2022_small.csv")
-df = df_full[training_features]              # exact match
+
+# Match only the columns used in training
+try:
+    df = df_full[training_features]
+except KeyError:
+    st.error("❌ Error: Columns in dataset don't match training features.")
+    st.stop()
+
 labels = df_full["Attack_type"]
 
 # Sidebar controls
 st.sidebar.header("⚙️ Simulation Settings")
-row_limit = st.sidebar.slider("Select how many data rows to simulate:", 10, 100, 25)
-delay = st.sidebar.slider("Delay between predictions (seconds):", 0.1, 2.0, 0.5)
+row_limit = st.sidebar.slider("Select how many rows to simulate", 10, 100, 25)
+delay = st.sidebar.slider("Delay between each prediction (seconds)", 0.1, 2.0, 0.5)
 
-# Tabs for layout
+# Tabs for output
 tab1, tab2 = st.tabs(["📋 Detection Log", "📊 Attack Summary"])
 
 if st.button("🚀 Start Simulation"):
@@ -37,12 +44,16 @@ if st.button("🚀 Start Simulation"):
     chart_data = []
 
     for i in range(row_limit):
-        row = df.iloc[i].values.reshape(1, -1)
-        prediction = model.predict(row)[0]
-        actual = labels.iloc[i]
+        try:
+            row = df.iloc[i].values.reshape(1, -1)
+            prediction = model.predict(row)[0]
+            actual = labels.iloc[i]
+        except Exception as e:
+            st.error(f"❌ Error during prediction: {e}")
+            break
 
         result_log.append({
-            "Row #": i + 1,
+            "Row": i + 1,
             "Predicted Attack": prediction,
             "Actual Attack": actual
         })
@@ -54,7 +65,7 @@ if st.button("🚀 Start Simulation"):
             st.subheader("📋 Real-Time Prediction Log")
             st.dataframe(result_df, use_container_width=True)
             if prediction != "Benign":
-                st.warning(f"⚠️ Alert: {prediction} attack detected!")
+                st.warning(f"⚠️ Possible Threat Detected: {prediction}")
 
         with tab2:
             st.subheader("📊 Pie Chart of Detected Attacks")
