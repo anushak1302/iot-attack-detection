@@ -4,77 +4,109 @@ import joblib
 import json
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Set page config
+# --------------------------
+# 🎨 App Styling & Config
+# --------------------------
 st.set_page_config(page_title="IoT Attack Detection", layout="wide")
-st.title("🔐 IoT Attack Detection Dashboard")
-st.markdown("Select a machine learning model to detect IoT network attacks in real time.")
+st.markdown(
+    "<h1 style='color:#009999; text-align:center;'>🔐 IoT Attack Detection Dashboard</h1>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "<h4 style='text-align:center;'>Real-time simulated detection using multiple ML models</h4><hr style='border-top: 1px solid #ccc;'>",
+    unsafe_allow_html=True,
+)
 
-# Model selection dropdown
-model_choice = st.sidebar.selectbox("🔧 Choose a model", ["Random Forest", "SVM", "KNN", "Gradient Boosting"])
+# --------------------------
+# 🔍 Model Selection
+# --------------------------
+model_choice = st.sidebar.selectbox(
+    "🧠 Choose ML Model",
+    ["Random Forest", "SVM", "KNN", "Gradient Boosting"]
+)
 
-# Load selected model
 model_files = {
     "Random Forest": "rf_model.pkl",
     "SVM": "svm_model.pkl",
     "KNN": "knn_model.pkl",
     "Gradient Boosting": "gb_model.pkl"
 }
+
 model = joblib.load(model_files[model_choice])
 
-# Load feature names and scaler
+# --------------------------
+# 📂 Load Metadata
+# --------------------------
 with open("features.json", "r") as f:
     feature_names = json.load(f)
 
 scaler = joblib.load("scaler.pkl")
 
-# Load dataset for testing
-df_full = pd.read_csv("streamlit_test_balanced_100_fakebenign.csv")
+# --------------------------
+# 🧪 Load Test Data
+# --------------------------
+df_full = pd.read_csv("streamlit_test_attacktypes_90_correct.csv")
 df_full = df_full.dropna()
 df = df_full[feature_names]
 labels = df_full["Attack_type"]
-
-# Scale features
 df_scaled = scaler.transform(df)
 
-# Sidebar controls
+# --------------------------
+# ⚙️ Simulation Settings
+# --------------------------
 st.sidebar.header("⚙️ Simulation Settings")
-row_limit = st.sidebar.slider("Rows to simulate:", 10, len(df), 25)
-delay = st.sidebar.slider("Delay between predictions (sec):", 0.1, 2.0, 0.5)
+delay = st.sidebar.slider("⏳ Delay between predictions (sec)", 0.1, 2.0, 0.4)
+sample_size = st.sidebar.slider("🔁 Rows to simulate (randomized each run)", 1, 15, 10)
 
-# UI placeholders
+# --------------------------
+# 📋 UI Placeholders
+# --------------------------
 tab1, tab2 = st.tabs(["📋 Detection Log", "📊 Attack Summary"])
 log_placeholder = tab1.empty()
 chart_placeholder = tab2.empty()
 
-if st.button("🚀 Start Detection"):
-    results = []
-    predictions = []
+# --------------------------
+# 🚀 Simulate Button
+# --------------------------
+if st.button("🚀 Start Simulation"):
+    result_log = []
+    chart_data = []
 
-    for i in range(row_limit):
-        row = df_scaled[i].reshape(1, -1)
-        pred = model.predict(row)[0]
-        actual = labels.iloc[i]
+    indices = np.random.choice(len(df_scaled), size=sample_size, replace=False)
 
-        results.append({"Row": i+1, "Predicted": pred, "Actual": actual})
-        predictions.append(pred)
+    for i, idx in enumerate(indices):
+        row = df_scaled[idx].reshape(1, -1)
+        prediction = model.predict(row)[0]
+        actual = labels.iloc[idx]
 
-        log_df = pd.DataFrame(results)
+        result_log.append({
+            "Row": i + 1,
+            "Predicted": prediction,
+            "Actual": actual
+        })
+        chart_data.append(prediction)
 
-        # Update log table
+        result_df = pd.DataFrame(result_log)
+
+        # --- Detection Log ---
         with tab1:
             log_placeholder.subheader("📋 Real-Time Detection Log")
-            log_placeholder.dataframe(log_df, use_container_width=True)
-            if pred != "Benign":
-                st.warning(f"⚠️ Threat detected: {pred}")
+            st.dataframe(result_df.style.applymap(
+                lambda x: 'background-color: #ffcccc' if x != "Benign" and x == prediction else '',
+                subset=["Predicted"]
+            ), use_container_width=True)
+            if prediction != "Benign":
+                st.warning(f"⚠️ Alert: Potential `{prediction}` detected!")
 
-        # Update pie chart
+        # --- Pie Chart Summary ---
         with tab2:
-            pie_data = pd.Series(predictions).value_counts()
+            pie_data = pd.Series(chart_data).value_counts()
             fig, ax = plt.subplots()
-            pie_data.plot.pie(autopct="%1.1f%%", startangle=90, colors=plt.cm.tab20.colors)
+            pie_data.plot.pie(autopct="%1.1f%%", startangle=90, colors=plt.cm.Set3.colors)
             ax.set_ylabel("")
-            chart_placeholder.subheader("📊 Attack Summary")
+            chart_placeholder.subheader("📊 Attack Distribution")
             chart_placeholder.pyplot(fig)
 
         time.sleep(delay)
