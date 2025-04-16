@@ -145,3 +145,39 @@ if st.button("🚀 Start Simulation"):
             chart_placeholder.pyplot(fig)
 
         time.sleep(delay)
+
+
+    # ===============================
+    # ✅ Summary: Evaluation Metrics
+    # ===============================
+    from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+
+    st.success("✅ Simulation Complete!")
+
+    # -- Report Metrics
+    y_true = [row["Actual"] for row in result_log]
+    y_pred = [row["Predicted"] for row in result_log]
+
+    st.subheader("📈 Classification Report")
+    report = classification_report(y_true, y_pred, output_dict=True)
+    report_df = pd.DataFrame(report).transpose()
+    st.dataframe(report_df.style.background_gradient(cmap="BuGn"), use_container_width=True)
+
+    # -- Confusion Matrix
+    st.subheader("🔁 Confusion Matrix")
+    fig_cm, ax_cm = plt.subplots(figsize=(6, 4))
+    cm = confusion_matrix(y_true, y_pred, labels=np.unique(y_true))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=np.unique(y_true))
+    disp.plot(ax=ax_cm, cmap="Blues", xticks_rotation=45)
+    st.pyplot(fig_cm)
+
+    # -- Download Button
+    st.subheader("📤 Download Prediction Log")
+    csv = result_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="⬇️ Download CSV",
+        data=csv,
+        file_name='iot_attack_predictions.csv',
+        mime='text/csv',
+    )
+
