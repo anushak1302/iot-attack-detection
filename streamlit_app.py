@@ -5,37 +5,42 @@ import json
 import time
 import matplotlib.pyplot as plt
 
-# Set up Streamlit page
 st.set_page_config(page_title="IoT Attack Detection", layout="wide")
 st.title("🔐 IoT Attack Detection Dashboard")
 st.markdown("This app simulates real-time detection of IoT network attacks using a Random Forest model.")
 
-# Load trained model (fast version)
+# Load model and features
 model = joblib.load("new_model_all_features.pkl")
-
-# Load the features used for training
 with open("features.json", "r") as f:
     training_features = json.load(f)
 
-# Load dataset (can switch to 'RT_IOT2022.csv' if you prefer full)
-df_full = pd.read_csv("RT_IOT2022_small.csv")  # Or use the full version
-df = df_full[training_features]
-labels = df_full["Attack_type"]
+# Load full dataset and filter
+df_full = pd.read_csv("RT_IOT2022.csv")  # or use RT_IOT2022_small.csv
+df_full = df_full.dropna()
 
-# Sidebar for simulation settings
+# Sample 20% Benign, 80% Attack to make it realistic
+benign_df = df_full[df_full["Attack_type"] == "Benign"].sample(n=20, random_state=42)
+attack_df = df_full[df_full["Attack_type"] != "Benign"].sample(n=80, random_state=42)
+df_sim = pd.concat([benign_df, attack_df]).sample(frac=1, random_state=42)  # shuffle
+
+# Prepare features and labels
+df = df_sim[training_features]
+labels = df_sim["Attack_type"]
+
+# Sidebar controls
 st.sidebar.header("⚙️ Simulation Settings")
 row_limit = st.sidebar.slider("How many rows to simulate?", 10, 100, 25)
-delay = st.sidebar.slider("Delay between predictions (seconds)", 0.1, 2.0, 0.5)
+delay = st.sidebar.slider("Delay between predictions (sec)", 0.1, 2.0, 0.5)
 
-# Tabs for log and summary
 tab1, tab2 = st.tabs(["📋 Detection Log", "📊 Attack Summary"])
+log_placeholder = tab1.empty()
+chart_placeholder = tab2.empty()
 
-# Start simulation
 if st.button("🚀 Start Simulation"):
     result_log = []
     chart_data = []
 
-    for i in range(row_limit):
+    for i in range(min(row_limit, len(df))):
         try:
             row = df.iloc[i].values.reshape(1, -1)
             prediction = model.predict(row)[0]
@@ -50,23 +55,21 @@ if st.button("🚀 Start Simulation"):
             "Actual": actual
         })
         chart_data.append(prediction)
-
         result_df = pd.DataFrame(result_log)
 
-        # Detection log tab
         with tab1:
-            st.subheader("📋 Real-Time Detection Log")
-            st.dataframe(result_df, use_container_width=True)
+            log_placeholder.subheader("📋 Real-Time Detection Log")
+            log_placeholder.dataframe(result_df, use_container_width=True)
+
             if prediction != "Benign":
                 st.warning(f"⚠️ Alert: {prediction} attack detected!")
 
-        # Pie chart summary tab
         with tab2:
-            st.subheader("📊 Attack Summary")
             pie_data = pd.Series(chart_data).value_counts()
             fig, ax = plt.subplots()
             pie_data.plot.pie(autopct='%1.1f%%', startangle=90, colors=plt.cm.tab20.colors)
             ax.set_ylabel("")
-            st.pyplot(fig)
+            chart_placeholder.subheader("📊 Attack Summary")
+            chart_placeholder.pyplot(fig)
 
         time.sleep(delay)
