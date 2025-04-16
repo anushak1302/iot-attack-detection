@@ -1,1 +1,62 @@
-{"nbformat":4,"nbformat_minor":0,"metadata":{"colab":{"provenance":[],"authorship_tag":"ABX9TyNooc0kxuUhXPyz1XA8ifrw"},"kernelspec":{"name":"python3","display_name":"Python 3"},"language_info":{"name":"python"}},"cells":[{"cell_type":"code","execution_count":3,"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"id":"qiwNZSmPyrUv","executionInfo":{"status":"ok","timestamp":1744827578010,"user_tz":-330,"elapsed":8780,"user":{"displayName":"Anusha Karve","userId":"16690333593069487253"}},"outputId":"19189206-1cc0-4dd5-ce64-3fc3903787f0"},"outputs":[{"output_type":"stream","name":"stdout","text":["Collecting streamlit\n","  Downloading streamlit-1.44.1-py3-none-any.whl.metadata (8.9 kB)\n","Collecting pyngrok\n","  Downloading pyngrok-7.2.4-py3-none-any.whl.metadata (8.7 kB)\n","Requirement already satisfied: altair<6,>=4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (5.5.0)\n","Requirement already satisfied: blinker<2,>=1.0.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (1.9.0)\n","Requirement already satisfied: cachetools<6,>=4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (5.5.2)\n","Requirement already satisfied: click<9,>=7.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (8.1.8)\n","Requirement already satisfied: numpy<3,>=1.23 in /usr/local/lib/python3.11/dist-packages (from streamlit) (2.0.2)\n","Requirement already satisfied: packaging<25,>=20 in /usr/local/lib/python3.11/dist-packages (from streamlit) (24.2)\n","Requirement already satisfied: pandas<3,>=1.4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (2.2.2)\n","Requirement already satisfied: pillow<12,>=7.1.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (11.1.0)\n","Requirement already satisfied: protobuf<6,>=3.20 in /usr/local/lib/python3.11/dist-packages (from streamlit) (5.29.4)\n","Requirement already satisfied: pyarrow>=7.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (18.1.0)\n","Requirement already satisfied: requests<3,>=2.27 in /usr/local/lib/python3.11/dist-packages (from streamlit) (2.32.3)\n","Requirement already satisfied: tenacity<10,>=8.1.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (9.1.2)\n","Requirement already satisfied: toml<2,>=0.10.1 in /usr/local/lib/python3.11/dist-packages (from streamlit) (0.10.2)\n","Requirement already satisfied: typing-extensions<5,>=4.4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (4.13.1)\n","Collecting watchdog<7,>=2.1.5 (from streamlit)\n","  Downloading watchdog-6.0.0-py3-none-manylinux2014_x86_64.whl.metadata (44 kB)\n","\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m44.3/44.3 kB\u001b[0m \u001b[31m1.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n","\u001b[?25hRequirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in /usr/local/lib/python3.11/dist-packages (from streamlit) (3.1.44)\n","Collecting pydeck<1,>=0.8.0b4 (from streamlit)\n","  Downloading pydeck-0.9.1-py2.py3-none-any.whl.metadata (4.1 kB)\n","Requirement already satisfied: tornado<7,>=6.0.3 in /usr/local/lib/python3.11/dist-packages (from streamlit) (6.4.2)\n","Requirement already satisfied: PyYAML>=5.1 in /usr/local/lib/python3.11/dist-packages (from pyngrok) (6.0.2)\n","Requirement already satisfied: jinja2 in /usr/local/lib/python3.11/dist-packages (from altair<6,>=4.0->streamlit) (3.1.6)\n","Requirement already satisfied: jsonschema>=3.0 in /usr/local/lib/python3.11/dist-packages (from altair<6,>=4.0->streamlit) (4.23.0)\n","Requirement already satisfied: narwhals>=1.14.2 in /usr/local/lib/python3.11/dist-packages (from altair<6,>=4.0->streamlit) (1.34.1)\n","Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.11/dist-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.12)\n","Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.11/dist-packages (from pandas<3,>=1.4.0->streamlit) (2.8.2)\n","Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.11/dist-packages (from pandas<3,>=1.4.0->streamlit) (2025.2)\n","Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.11/dist-packages (from pandas<3,>=1.4.0->streamlit) (2025.2)\n","Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.27->streamlit) (3.4.1)\n","Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.27->streamlit) (3.10)\n","Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.27->streamlit) (2.3.0)\n","Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.27->streamlit) (2025.1.31)\n","Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.11/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (5.0.2)\n","Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.11/dist-packages (from jinja2->altair<6,>=4.0->streamlit) (3.0.2)\n","Requirement already satisfied: attrs>=22.2.0 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (25.3.0)\n","Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (2024.10.1)\n","Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.36.2)\n","Requirement already satisfied: rpds-py>=0.7.1 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.24.0)\n","Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.11/dist-packages (from python-dateutil>=2.8.2->pandas<3,>=1.4.0->streamlit) (1.17.0)\n","Downloading streamlit-1.44.1-py3-none-any.whl (9.8 MB)\n","\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m9.8/9.8 MB\u001b[0m \u001b[31m37.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n","\u001b[?25hDownloading pyngrok-7.2.4-py3-none-any.whl (23 kB)\n","Downloading pydeck-0.9.1-py2.py3-none-any.whl (6.9 MB)\n","\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m6.9/6.9 MB\u001b[0m \u001b[31m91.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n","\u001b[?25hDownloading watchdog-6.0.0-py3-none-manylinux2014_x86_64.whl (79 kB)\n","\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m79.1/79.1 kB\u001b[0m \u001b[31m5.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n","\u001b[?25hInstalling collected packages: watchdog, pyngrok, pydeck, streamlit\n","Successfully installed pydeck-0.9.1 pyngrok-7.2.4 streamlit-1.44.1 watchdog-6.0.0\n"]}],"source":["!pip install streamlit pyngrok\n"]},{"cell_type":"code","source":["from google.colab import drive\n","drive.mount('/content/drive')\n"],"metadata":{"id":"TBmttXf8zPEQ","colab":{"base_uri":"https://localhost:8080/"},"executionInfo":{"status":"ok","timestamp":1744827663953,"user_tz":-330,"elapsed":17242,"user":{"displayName":"Anusha Karve","userId":"16690333593069487253"}},"outputId":"1980fe01-8396-41e0-9a0b-a93ae1711ab6"},"execution_count":6,"outputs":[{"output_type":"stream","name":"stdout","text":["Mounted at /content/drive\n"]}]},{"cell_type":"code","source":["import os\n","os.chdir('/content/drive/My Drive/BE Project')\n"],"metadata":{"id":"DNDp_7Zp1U-M","executionInfo":{"status":"ok","timestamp":1744827674072,"user_tz":-330,"elapsed":294,"user":{"displayName":"Anusha Karve","userId":"16690333593069487253"}}},"execution_count":7,"outputs":[]},{"cell_type":"code","source":["!ngrok config add-authtoken YOUR_TOKEN_HERE\n"],"metadata":{"colab":{"base_uri":"https://localhost:8080/"},"id":"7C1VbHU41XLt","executionInfo":{"status":"ok","timestamp":1744827867374,"user_tz":-330,"elapsed":543,"user":{"displayName":"Anusha Karve","userId":"16690333593069487253"}},"outputId":"a7f88866-f1b2-4006-877e-69d936d693ee"},"execution_count":9,"outputs":[{"output_type":"stream","name":"stdout","text":["Authtoken saved to configuration file: /root/.config/ngrok/ngrok.yml\n"]}]},{"cell_type":"code","source":[],"metadata":{"id":"DuOLdYxt2Gq3"},"execution_count":null,"outputs":[]}]}
+import streamlit as st
+import pandas as pd
+import joblib
+import time
+import matplotlib.pyplot as plt
+
+# Page config
+st.set_page_config(page_title="IoT Intrusion Detection", layout="wide")
+
+# Title
+st.title("🔐 IoT Intrusion Detection Dashboard")
+st.markdown("Simulated attack detection using a trained Gradient Boosting model on IoT data.")
+
+# Load model
+model = joblib.load("random_forest_model.pkl")
+
+# Load dataset (use the smaller file for GitHub deployment)
+df = pd.read_csv("RT_IOT2022_small.csv")
+
+# Preprocess
+features = df.drop(columns=["Attack_type", "no", "proto", "service"])
+labels = df["Attack_type"]
+
+# Sidebar controls
+st.sidebar.header("⚙️ Simulation Settings")
+row_limit = st.sidebar.slider("Number of simulated rows", 10, 100, 25)
+delay = st.sidebar.slider("Delay per row (sec)", 0.1, 2.0, 0.5)
+
+# Tabs
+tab1, tab2 = st.tabs(["🧪 Live Detection Log", "📊 Attack Type Pie Chart"])
+start_simulation = st.button("🚀 Start Simulation")
+
+if start_simulation:
+    result_log = []
+    chart_data = []
+
+    for i in range(row_limit):
+        row = features.iloc[i].values.reshape(1, -1)
+        prediction = model.predict(row)[0]
+        actual = labels.iloc[i]
+
+        result_log.append({"Index": i, "Predicted": prediction, "Actual": actual})
+        chart_data.append(prediction)
+        result_df = pd.DataFrame(result_log)
+
+        # Tab 1: Log view
+        with tab1:
+            st.subheader("📋 Prediction Log")
+            st.dataframe(result_df, use_container_width=True)
+            if prediction != "Benign":
+                st.error(f"⚠️ ALERT: {prediction} attack detected!")
+
+        # Tab 2: Pie chart view
+        with tab2:
+            st.subheader("📊 Pie Chart of Detected Attack Types")
+            pie_df = pd.Series(chart_data).value_counts()
+            fig, ax = plt.subplots()
+            pie_df.plot.pie(autopct='%1.1f%%', startangle=90, colors=plt.cm.tab20.colors)
+            ax.set_ylabel("")
+            st.pyplot(fig)
+
+        time.sleep(delay)
