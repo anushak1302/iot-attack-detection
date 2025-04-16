@@ -5,6 +5,7 @@ import json
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 # --------------------------
 # 🎨 App Styling & Config
@@ -49,9 +50,17 @@ scaler = joblib.load("scaler.pkl")
 # --------------------------
 df_full = pd.read_csv("streamlit_test_attacktypes_90_correct.csv")
 df_full = df_full.dropna()
-df = df_full[feature_names]
-labels = df_full["Attack_type"]
-df_scaled = scaler.transform(df)
+
+# Split Benign and Attacks separately
+df_benign = df_full[df_full["Attack_type"] == "Benign"]
+df_attack = df_full[df_full["Attack_type"] != "Benign"]
+
+# Prepare features
+df_benign_scaled = scaler.transform(df_benign[feature_names])
+df_attack_scaled = scaler.transform(df_attack[feature_names])
+
+labels_benign = df_benign["Attack_type"].reset_index(drop=True)
+labels_attack = df_attack["Attack_type"].reset_index(drop=True)
 
 # --------------------------
 # ⚙️ Simulation Settings
@@ -74,12 +83,35 @@ if st.button("🚀 Start Simulation"):
     result_log = []
     chart_data = []
 
-    indices = np.random.choice(len(df_scaled), size=sample_size, replace=False)
+    # Simulate 20% benign rows and 80% attack rows
+    num_benign = max(1, int(sample_size * 0.2))
+    num_attack = sample_size - num_benign
 
-    for i, idx in enumerate(indices):
-        row = df_scaled[idx].reshape(1, -1)
+    benign_indices = np.random.choice(len(df_benign_scaled), size=num_benign, replace=False)
+    attack_indices = np.random.choice(len(df_attack_scaled), size=num_attack, replace=False)
+
+    combined_rows = []
+
+    for i in benign_indices:
+        combined_rows.append({
+            "data": df_benign_scaled[i].reshape(1, -1),
+            "actual": labels_benign[i]
+        })
+
+    for i in attack_indices:
+        combined_rows.append({
+            "data": df_attack_scaled[i].reshape(1, -1),
+            "actual": labels_attack[i]
+        })
+
+    # Shuffle all selected rows
+    random.shuffle(combined_rows)
+
+    # Run prediction on each row
+    for i, row_info in enumerate(combined_rows):
+        row = row_info["data"]
+        actual = row_info["actual"]
         prediction = model.predict(row)[0]
-        actual = labels.iloc[idx]
 
         result_log.append({
             "Row": i + 1,
@@ -90,17 +122,20 @@ if st.button("🚀 Start Simulation"):
 
         result_df = pd.DataFrame(result_log)
 
-        # --- Detection Log ---
+        # --- Update Detection Log ---
         with tab1:
             log_placeholder.subheader("📋 Real-Time Detection Log")
-            st.dataframe(result_df.style.applymap(
-                lambda x: 'background-color: #ffcccc' if x != "Benign" and x == prediction else '',
-                subset=["Predicted"]
-            ), use_container_width=True)
+            log_placeholder.dataframe(
+                result_df.style.applymap(
+                    lambda x: 'background-color: #ffcccc' if x != "Benign" and x == prediction else '',
+                    subset=["Predicted"]
+                ),
+                use_container_width=True
+            )
             if prediction != "Benign":
-                st.warning(f"⚠️ Alert: Potential `{prediction}` detected!")
+                st.warning(f"⚠️ Alert: `{prediction}` attack detected!")
 
-        # --- Pie Chart Summary ---
+        # --- Update Pie Chart ---
         with tab2:
             pie_data = pd.Series(chart_data).value_counts()
             fig, ax = plt.subplots()
